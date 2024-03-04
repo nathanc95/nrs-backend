@@ -44,6 +44,19 @@ class DB {
             pgp.end();
         }
     }
+
+    async any(query, values = []) {
+        const conn = this.createConnection();
+        try {
+            return await conn.any(query, values);
+        }
+        catch (err) {
+            return  err;
+        }
+        finally {
+            pgp.end();
+        }
+    }
 }
 
 module.exports = new DB();

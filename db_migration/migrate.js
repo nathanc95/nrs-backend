@@ -103,6 +103,7 @@ class Migrate {
             if (!existTables.counties) {
                 await this.massCountiesInsert(this.requireJsonFiles(dbMigrateUtils.jsonCountiesData));
             }
+            console.debug('done setting up the database');
         } catch (err) {
             return err
         }

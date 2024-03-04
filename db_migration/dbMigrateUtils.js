@@ -1,3 +1,5 @@
+const path = require("path");
+
 class dbMigrateUtils {
     jsonCountiesData = [
         '../assets/counties/Alabama.json',
@@ -52,6 +54,24 @@ class dbMigrateUtils {
         '../assets/counties/Wisconsin.json',
         '../assets/counties/Wyoming.json'
     ];
+    requireJsonFiles(filePaths) {
+        return filePaths.map(filePath => {
+            try {
+                let statePath = path.resolve(filePath).split("/");
+                let stateName = path.resolve(filePath)
+                    .split("/")[statePath.length - 1]
+                    .replace('.json', '');
+                const countiesData = require(filePath);
+                return {
+                    stateName,
+                    countiesData
+                }
+            } catch (error) {
+                console.error(`Error requiring file:`, error);
+                return null;
+            }
+        });
+    }
 }
 
 module.exports = new dbMigrateUtils();

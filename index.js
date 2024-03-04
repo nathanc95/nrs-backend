@@ -1,11 +1,21 @@
 const express = require('express');
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 8080;
 const dbMigration = require('./db_migration/migrate');
 const stateRepository = require('./repository/stateRepository');
 const countyRepository = require('./repository/countyRepository');
 const countyService = require('./services/countyService');
+const cors = require('cors');
 
-express()
+const app = express();
+
+// Enable CORS with custom options
+app.use(cors({
+    origin: 'http://localhost:5174', // Specify the allowed origin (Vue.js app)
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Allow credentials (cookies, HTTP authentication) to be sent to the server
+}));
+
+app
     .get('/state', async (req, res) => {
         try {
             const fetchAllDataRes = await stateRepository.fetchAllStates();

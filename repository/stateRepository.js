@@ -1,6 +1,12 @@
 const dbConnection = require("./postgre/db");
 
-class StateRepository {
+module.exports = class StateRepository {
+    dbConnection = null;
+
+    constructor(dbConnection) {
+        this.dbConnection = dbConnection;
+    }
+
     async fetchAllStates() {
         console.debug('trying to retrieve all the states from the database');
         try {
@@ -13,5 +19,3 @@ class StateRepository {
         }
     }
 }
-
-module.exports = new StateRepository();

@@ -1,13 +1,16 @@
-const path = require('path');
-const dbConnection = require('../repository/postgre/db');
 const pgp = require('pg-promise')();
 const dbMigrateUtils = require('./dbMigrateUtils');
 
 // States Data
 const jsonObjects = require('../assets/UsaStates.json');
-const {query} = require("express");
 
-class Migrate {
+module.exports = class Migrate {
+    dbConnection = null;
+
+    constructor(dbConnection) {
+        this.dbConnection = dbConnection;
+    }
+
     async verifyStructure() {
         let validTables = {
             state: false,
@@ -52,19 +55,19 @@ class Migrate {
                     REFERENCES states (id)
         );`
 
-        await dbConnection.query(query);
+        await this.dbConnection.query(query);
     }
 
     async massStateInsert() {
         const template = pgp.helpers.insert(jsonObjects, ['state', 'population',
             'counties', 'detail'], 'states');
-        await dbConnection.query(template);
+        await this.dbConnection.query(template);
     }
 
     async massCountiesInsert(countiesContent) {
         // first we need to select all the states to get the state id
         const fetchAllStatesQuery = `select id, state from states`;
-        const fetchStateAll = await dbConnection.any(fetchAllStatesQuery);
+        const fetchStateAll = await this.dbConnection.any(fetchAllStatesQuery);
 
         let mergedCounties = [];
         countiesContent.map((countie) => {
@@ -76,10 +79,10 @@ class Migrate {
             });
         });
         const template = pgp.helpers.insert(mergedCounties, ['county', 'population', 'stateid'], 'counties');
-        await dbConnection.query(template);
+        await this.dbConnection.query(template);
     }
 
-    async init() {
+    async main() {
         console.debug('setting up the database');
         // Call the function to insert the JSON array into the table
         try {
@@ -101,8 +104,4 @@ class Migrate {
         }
     }
 }
-
-new Migrate().init();
-
-module.exports = new Migrate();
 

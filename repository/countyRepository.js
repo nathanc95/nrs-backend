@@ -1,23 +1,28 @@
-const dbConnection = require("./postgre/db");
+module.exports = class CountryRepository {
+    dbConnection = null;
 
-class CountryRepository {
+    constructor(dbConnection) {
+        this.dbConnection = dbConnection;
+    }
+
     fetchCountiesPerNameQuery = `
-        select c.id, c.county, c.population, c.statename
+        select c.id, c.county, c.population, c.stateid, s.state
         from counties as c
-        where LOWER(statename) = $1`
+        inner join states as s on s.id = c.stateid
+        where stateid = $1`
 
     fetchSumOfPopulationsPerCountyQuery = `
         select sum(c.population) as sumCountyPopulation, s.population as statePopulation
         from counties as c
-        inner join states as s on s.state = c.statename
-        where LOWER(statename) = $1
+        inner join states as s on s.id = c.stateid
+        where stateid = $1
         group by s.population
     `;
 
-    async fetchCountyPerState(stateName) {
-        console.debug('trying to retrieve all the county for state: ', stateName);
+    async fetchCountyPerState(stateId) {
+        console.debug('trying to retrieve all the county for state: ', stateId);
         try {
-            const res = await dbConnection.any(this.fetchCountiesPerNameQuery, [stateName.toLowerCase()]);
+            const res = await this.dbConnection.any(this.fetchCountiesPerNameQuery, [stateId]);
             console.debug({res});
             return res;
         } catch (err) {
@@ -25,10 +30,10 @@ class CountryRepository {
         }
     }
 
-    async fetchSumOfPopulationsPerCounty(stateName) {
-        console.debug('trying to retrieve the sum of populations for state: ', stateName);
+    async fetchSumOfPopulationsPerCounty(stateId) {
+        console.debug('trying to retrieve the sum of populations for state: ', stateId);
         try {
-            const res = await dbConnection.any(this.fetchSumOfPopulationsPerCountyQuery, [stateName.toLowerCase()]);
+            const res = await this.dbConnection.any(this.fetchSumOfPopulationsPerCountyQuery, [stateId]);
             console.debug({res});
             return res;
         } catch (err) {
@@ -36,5 +41,3 @@ class CountryRepository {
         }
     }
 }
-
-module.exports = new CountryRepository();

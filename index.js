@@ -1,12 +1,16 @@
 const express = require('express');
 const PORT = process.env.PORT || 8080;
-const dbMigration = require('./db_migration/migrate');
-const stateRepository = require('./repository/stateRepository');
-const countyRepository = require('./repository/countyRepository');
-const countyService = require('./services/countyService');
 const cors = require('cors');
 
+const StateRepository = require('./repository/stateRepository');
+const dbConnection = require("./repository/postgre/db");
+
+const Migrate = require('./db_migration/migrate');
+const CountyService = require('./services/countyService');
+const CountyRepository = require("./repository/countyRepository");
+
 const app = express();
+const databaseConnection = dbConnection.createConnection();
 
 // Enable CORS with custom options
 app.use(cors({
@@ -18,6 +22,7 @@ app.use(cors({
 app
     .get('/state', async (req, res) => {
         try {
+            const stateRepository = new StateRepository(databaseConnection);
             const fetchAllDataRes = await stateRepository.fetchAllStates();
             return res.send(fetchAllDataRes);
         } catch (err) {
@@ -28,11 +33,12 @@ app
             }));
         }
     })
-    .get('/county/:name', async (req, res) => {
+    .get('/county/:id', async (req, res) => {
         try {
-            const countyName = req.params.name;
-            countyService.init(countyRepository);
-            const resMainCounty = await countyService.mainCounty(countyName);
+            const countyId = parseInt(req.params.id, 10);
+            const countyRepository = new CountyRepository(databaseConnection);
+            const countyService = new CountyService(countyRepository);
+            const resMainCounty = await countyService.mainCounty(countyId);
             return res.send(resMainCounty);
         } catch (err) {
             console.error(err);
@@ -44,7 +50,8 @@ app
     })
     .listen(PORT, async() => {
         try {
-            await dbMigration.init();
+            const migrate = new Migrate(databaseConnection);
+            await migrate.main();
         } catch (err) {
             console.error('unable to set up the database', err);
         }

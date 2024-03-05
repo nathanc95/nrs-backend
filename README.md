@@ -9,9 +9,11 @@ Docker
 
 Getting Started
 
-pull docker image: nathanchemla95/nrs-backend
-git clone https://github.com/nathanc95/nrs-backend.git
-docker-compose up
+pull docker image: nathanchemla95/nrs-backend 
+
+clone github repository: git clone https://github.com/nathanc95/nrs-backend.git
+
+go to your download repository and run docker compose on the terminal: docker-compose up
 
 Here is short list of libraries that are used
 

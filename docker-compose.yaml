@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
   express-app:
-    image: nrs-backend/dockerize-express-app:latest
+    image: nathanchemla95/nrs-backend
     container_name: nrs-backend-app-container
     environment:
       DB_USER: nrspostgres

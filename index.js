@@ -36,6 +36,14 @@ app
     .get('/county/:id', async (req, res) => {
         try {
             const countyId = parseInt(req.params.id, 10);
+
+            if (isNaN(countyId)) {
+                return res.send({
+                    "success": false,
+                    "errorMessage": "invalid county provided"
+                });
+            }
+
             const countyRepository = new CountyRepository(databaseConnection);
             const countyService = new CountyService(countyRepository);
             const resMainCounty = await countyService.mainCounty(countyId);

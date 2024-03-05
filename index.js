@@ -21,7 +21,12 @@ app.use(cors({
 app
     .get('/state', async (req, res) => {
         try {
+            //first we need to insert data and set up the database
             const databaseConnection = dbConnection.createConnection();
+            const migrate = new Migrate(databaseConnection);
+            await migrate.main();
+
+
             const stateRepository = new StateRepository(databaseConnection);
             const fetchAllDataRes = await stateRepository.fetchAllStates();
             return res.send(fetchAllDataRes);
@@ -58,12 +63,5 @@ app
         }
     })
     .listen(PORT, async() => {
-        try {
-            const databaseConnection = dbConnection.createConnection();
-            const migrate = new Migrate(databaseConnection);
-            await migrate.main();
-        } catch (err) {
-            console.error('unable to set up the database', err);
-        }
         console.log(`Listening on ${PORT}`)
     });

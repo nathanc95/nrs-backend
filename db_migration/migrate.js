@@ -1,7 +1,7 @@
 const dbMigrateUtils = require('./dbMigrateUtils');
 const { helpers } = require('pg-promise')();
 // States Data
-const jsonObjects = require('../assets/UsaStates.json');
+const jsonObjects = require('../assets/usaStates.json');
 
 module.exports = class Migrate {
     dbConnection = null;
@@ -11,6 +11,7 @@ module.exports = class Migrate {
     }
 
     async verifyStructure() {
+        console.debug('init the structure');
         let validTables = {
             state: false,
             counties: false
@@ -18,20 +19,26 @@ module.exports = class Migrate {
         const checkCountieQuery = `select count(id) from counties`;
         const checkStateCountieQuery = `select count(id) from states`;
 
-        const resCheckCountie = await this.dbConnection.oneOrNone(checkCountieQuery);
-        if (resCheckCountie !== undefined && parseInt(resCheckCountie.count, 10) > 0) {
-            validTables.counties = true;
-        }
+        try {
+            const resCheckCountie = await this.dbConnection.oneOrNone(checkCountieQuery);
+            if (resCheckCountie !== undefined && parseInt(resCheckCountie.count, 10) > 0) {
+                validTables.counties = true;
+            }
+        } catch (err) {}
 
-        const resCheckState = await this.dbConnection.oneOrNone(checkStateCountieQuery);
-        if (resCheckState !== undefined && parseInt(resCheckState.count, 10) > 0) {
-            validTables.state = true;
-        }
+        try {
+            const resCheckState = await this.dbConnection.oneOrNone(checkStateCountieQuery);
+            if (resCheckState !== undefined && parseInt(resCheckState.count, 10) > 0) {
+                validTables.state = true;
+            }
+        } catch (err) {}
 
+        console.debug('done init the structure');
         return validTables;
     }
 
     async initTables() {
+        console.debug('trying to init the tables');
         const query = `    
         CREATE TABLE IF NOT EXISTS states
         (
@@ -55,15 +62,18 @@ module.exports = class Migrate {
         );`
 
         await this.dbConnection.query(query);
+        console.debug('done init the tables');
     }
 
     async massStateInsert() {
+        console.debug('massStateInsert');
         const template = helpers.insert(jsonObjects, ['state', 'population',
             'counties', 'detail'], 'states');
         await this.dbConnection.query(template);
     }
 
     async massCountiesInsert(countiesContent) {
+        console.debug('massCountiesInsert');
         // first we need to select all the states to get the state id
         const fetchAllStatesQuery = `select id, state from states`;
         const fetchStateAll = await this.dbConnection.any(fetchAllStatesQuery);

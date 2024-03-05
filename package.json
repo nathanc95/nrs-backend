@@ -10,8 +10,6 @@
   },
   "scripts": {
     "serve": "cross-env NODE_ENV=development nodemon src/index.js",
-    "start": "node index.js",
-    "test": "node tests/mapper/ticketMasterMapper_test.js",
-    "dbTest": "node tests/repository/db.js"
+    "start": "node index.js"
   }
 }

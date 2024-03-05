@@ -8,12 +8,8 @@ module.exports = class CountyService {
     async mainCounty(countyName) {
         console.debug('trying to retrieve county data', {countyName});
         try {
-            const res = await Promise.all([
-                this.countyRepository.fetchCountyPerState(countyName),
-                this.countyRepository.fetchSumOfPopulationsPerCounty(countyName)
-            ])
-            const countiesDetails = res[0] ?? [];
-            const sumDetails = res[1] ?? [];
+            const countiesDetails =  await this.countyRepository.fetchCountyPerState(countyName);
+            const sumDetails = await this.countyRepository.fetchSumOfPopulationsPerCounty(countyName);
             console.debug('successfully retrieved county data', {sumDetails})
             return {
                 countiesDetails,

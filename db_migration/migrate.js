@@ -1,6 +1,5 @@
-const pgp = require('pg-promise')();
 const dbMigrateUtils = require('./dbMigrateUtils');
-
+const { helpers } = require('pg-promise')();
 // States Data
 const jsonObjects = require('../assets/UsaStates.json');
 
@@ -19,12 +18,12 @@ module.exports = class Migrate {
         const checkCountieQuery = `select count(id) from counties`;
         const checkStateCountieQuery = `select count(id) from states`;
 
-        const resCheckCountie = await dbConnection.oneOrNone(checkCountieQuery);
+        const resCheckCountie = await this.dbConnection.oneOrNone(checkCountieQuery);
         if (resCheckCountie !== undefined && parseInt(resCheckCountie.count, 10) > 0) {
             validTables.counties = true;
         }
 
-        const resCheckState = await dbConnection.oneOrNone(checkStateCountieQuery);
+        const resCheckState = await this.dbConnection.oneOrNone(checkStateCountieQuery);
         if (resCheckState !== undefined && parseInt(resCheckState.count, 10) > 0) {
             validTables.state = true;
         }
@@ -59,7 +58,7 @@ module.exports = class Migrate {
     }
 
     async massStateInsert() {
-        const template = pgp.helpers.insert(jsonObjects, ['state', 'population',
+        const template = helpers.insert(jsonObjects, ['state', 'population',
             'counties', 'detail'], 'states');
         await this.dbConnection.query(template);
     }
@@ -78,7 +77,7 @@ module.exports = class Migrate {
                 mergedCounties.push(data);
             });
         });
-        const template = pgp.helpers.insert(mergedCounties, ['county', 'population', 'stateid'], 'counties');
+        const template = helpers.insert(mergedCounties, ['county', 'population', 'stateid'], 'counties');
         await this.dbConnection.query(template);
     }
 

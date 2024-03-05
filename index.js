@@ -1,5 +1,5 @@
 const express = require('express');
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 const cors = require('cors');
 
 const StateRepository = require('./repository/stateRepository');
@@ -10,11 +10,10 @@ const CountyService = require('./services/countyService');
 const CountyRepository = require("./repository/countyRepository");
 
 const app = express();
-const databaseConnection = dbConnection.createConnection();
 
 // Enable CORS with custom options
 app.use(cors({
-    origin: 'http://localhost:5174', // Specify the allowed origin (Vue.js app)
+    origin: '*', // Specify the allowed origin (Vue.js app)
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, HTTP authentication) to be sent to the server
 }));
@@ -22,6 +21,7 @@ app.use(cors({
 app
     .get('/state', async (req, res) => {
         try {
+            const databaseConnection = dbConnection.createConnection();
             const stateRepository = new StateRepository(databaseConnection);
             const fetchAllDataRes = await stateRepository.fetchAllStates();
             return res.send(fetchAllDataRes);
@@ -35,6 +35,7 @@ app
     })
     .get('/county/:id', async (req, res) => {
         try {
+            const databaseConnection = dbConnection.createConnection();
             const countyId = parseInt(req.params.id, 10);
 
             if (isNaN(countyId)) {
@@ -58,6 +59,7 @@ app
     })
     .listen(PORT, async() => {
         try {
+            const databaseConnection = dbConnection.createConnection();
             const migrate = new Migrate(databaseConnection);
             await migrate.main();
         } catch (err) {

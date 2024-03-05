@@ -31,7 +31,7 @@ module.exports = class CountryRepository {
     }
 
     async fetchSumOfPopulationsPerCounty(stateId) {
-        console.debug('trying to retrieve the sum of populations for state: ', stateId);
+        console.debug('trying to retrieve the sum of populations per county: ', stateId);
         try {
             const res = await this.dbConnection.any(this.fetchSumOfPopulationsPerCountyQuery, [stateId]);
             console.debug({res});

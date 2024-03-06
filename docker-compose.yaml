@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
   express-app:
-    image: nathanchemla95/nrs-backend:amd
+    image: nathanchemla95/nrs-backend
     container_name: nrs-backend-app-container
     environment:
       DB_USER: nrspostgres
@@ -22,4 +22,3 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-    platform: amd64

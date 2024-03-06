@@ -9,7 +9,7 @@ Docker
 
 ### Getting Started
 
-pull docker image: nathanchemla95/nrs-backend 
+pull docker image: docker pull nathanchemla95/nrs-backend:amd 
 
 clone github repository: git clone https://github.com/nathanc95/nrs-backend.git
 

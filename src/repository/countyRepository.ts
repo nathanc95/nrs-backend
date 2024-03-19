@@ -1,7 +1,7 @@
-module.exports = class CountryRepository {
-    dbConnection = null;
+import DB from "./postgre/db";
 
-    constructor(dbConnection) {
+export default class CountryRepository {
+    constructor(private dbConnection: DB) {
         this.dbConnection = dbConnection;
     }
 
@@ -19,23 +19,19 @@ module.exports = class CountryRepository {
         group by s.population
     `;
 
-    async fetchCountyPerState(stateId) {
-        console.debug('trying to retrieve all the county for state: ', stateId);
+    async fetchCountyPerState(stateId: number): Promise<any> {
+        console.debug(`trying to retrieve all the country for state: ${ stateId }`);
         try {
-            const res = await this.dbConnection.any(this.fetchCountiesPerNameQuery, [stateId]);
-            console.debug({res});
-            return res;
+            return await this.dbConnection.any(this.fetchCountiesPerNameQuery, [stateId]);
         } catch (err) {
             throw err;
         }
     }
 
-    async fetchSumOfPopulationsPerCounty(stateId) {
-        console.debug('trying to retrieve the sum of populations per county: ', stateId);
+    async fetchSumOfPopulationsPerCounty(stateId: number): Promise<any> {
+        console.debug(`trying to retrieve the sum of populations per country: ${stateId}`);
         try {
-            const res = await this.dbConnection.any(this.fetchSumOfPopulationsPerCountyQuery, [stateId]);
-            console.debug({res});
-            return res;
+            return await this.dbConnection.any(this.fetchSumOfPopulationsPerCountyQuery, [stateId]);
         } catch (err) {
             throw err;
         }

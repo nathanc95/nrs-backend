@@ -1,12 +1,13 @@
+import DB from "../repository/postgre/db";
+
 const dbMigrateUtils = require('./dbMigrateUtils');
 const { helpers } = require('pg-promise')();
 // States Data
 const jsonObjects = require('../assets/usaStates.json');
 
-module.exports = class Migrate {
-    dbConnection = null;
+export default class Migrate {
 
-    constructor(dbConnection) {
+    constructor(private dbConnection: DB) {
         this.dbConnection = dbConnection;
     }
 
@@ -72,17 +73,17 @@ module.exports = class Migrate {
         await this.dbConnection.query(template);
     }
 
-    async massCountiesInsert(countiesContent) {
+    async massCountiesInsert(countiesContent: any): Promise<void> {
         console.debug('massCountiesInsert');
         // first we need to select all the states to get the state id
         const fetchAllStatesQuery = `select id, state from states`;
-        const fetchStateAll = await this.dbConnection.any(fetchAllStatesQuery);
+        const fetchStateAll = await this.dbConnection.any(fetchAllStatesQuery, []);
 
-        let mergedCounties = [];
-        countiesContent.map((countie) => {
+        let mergedCounties: any = [];
+        countiesContent.map((countie: any) => {
             const stateName = countie.stateName;
-            const stateId = fetchStateAll.filter((state) => state.state.replace(/ /g,'').toLowerCase() === stateName.toLowerCase())
-            countie.countiesData.map((data) => {
+            const stateId = fetchStateAll.filter((state: any) => state.state.replace(/ /g,'').toLowerCase() === stateName.toLowerCase())
+            countie.countiesData.map((data: any) => {
                 data.stateid = stateId[0].id;
                 mergedCounties.push(data);
             });

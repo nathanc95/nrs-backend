@@ -1,7 +1,7 @@
 const pgp = require('pg-promise')();
 const dotenv = require('dotenv');
 
-class DB {
+export default class DB {
     createConnection() {
         dotenv.config();
         const connection = {
@@ -19,7 +19,7 @@ class DB {
      *
      * @returns {Promise<*>}
      */
-    async query(template) {
+    async query(template: string) {
         const conn = this.createConnection();
         try {
             return await conn.none(template);
@@ -32,7 +32,7 @@ class DB {
         }
     }
 
-    async oneOrNone(query) {
+    async oneOrNone(query: string) {
         const conn = this.createConnection();
         try {
             return await conn.oneOrNone(query);
@@ -45,7 +45,7 @@ class DB {
         }
     }
 
-    async any(query, values = []) {
+    async any(query: string, values: Array<any>) {
         const conn = this.createConnection();
         try {
             return await conn.any(query, values);
@@ -58,5 +58,3 @@ class DB {
         }
     }
 }
-
-module.exports = new DB();

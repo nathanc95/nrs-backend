@@ -1,6 +1,11 @@
-const path = require("path");
+import * as path from 'path';
 
-class dbMigrateUtils {
+interface CountyData {
+    stateName: string
+    countiesData: any
+}
+
+class DbMigrateUtils {
     jsonCountiesData = [
         '../assets/counties/Alabama.json',
         '../assets/counties/Alaska.json',
@@ -54,18 +59,21 @@ class dbMigrateUtils {
         '../assets/counties/Wisconsin.json',
         '../assets/counties/Wyoming.json'
     ];
-    requireJsonFiles(filePaths) {
-        return filePaths.map(filePath => {
+
+    requireJsonFiles(filePaths: string[]): (CountyData | null)[] {
+        return filePaths.map((filePath) => {
             try {
-                let statePath = path.resolve(filePath).split("/");
-                let stateName = path.resolve(filePath)
-                    .split("/")[statePath.length - 1]
+                const statePath = path.resolve(filePath).split('/');
+                const stateName = path.resolve(filePath)
+                    .split('/')[statePath.length - 1]
                     .replace('.json', '');
+
                 const countiesData = require(filePath);
+
                 return {
                     stateName,
-                    countiesData
-                }
+                    countiesData,
+                };
             } catch (error) {
                 console.error(`Error requiring file:`, error);
                 return null;
@@ -74,4 +82,4 @@ class dbMigrateUtils {
     }
 }
 
-module.exports = new dbMigrateUtils();
+export default new DbMigrateUtils();

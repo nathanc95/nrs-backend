@@ -1,7 +1,7 @@
-module.exports = class StateRepository {
-    dbConnection = null;
+import DB from "./postgre/db";
 
-    constructor(dbConnection) {
+export default class StateRepository {
+    constructor(private dbConnection: DB) {
         this.dbConnection = dbConnection;
     }
 
@@ -9,7 +9,7 @@ module.exports = class StateRepository {
         console.debug('trying to retrieve all the states from the database');
         try {
             const query = `select id, state from states;`;
-            const res = await this.dbConnection.any(query);
+            const res = await this.dbConnection.any(query, []);
             console.debug({res});
             return res;
         } catch (err) {
